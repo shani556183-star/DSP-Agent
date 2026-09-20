@@ -1,0 +1,6 @@
+.env
+.env.*
+*.m4a
+*.webm
+*.part
+__pycache__/
