@@ -4,3 +4,4 @@
 *.webm
 *.part
 __pycache__/
+out/*.tmp
