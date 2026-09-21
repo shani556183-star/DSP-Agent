@@ -1,0 +1,34 @@
+{
+  "id": "pizza", "code": "PZ", "name": "Mario's Pizza", "industry": "Restaurant", "emoji": "🍕", "color": "#c8321f",
+  "tagline": "Hot, fresh pizza delivered in 45 minutes", "city": "Lahore", "phone": "+92 300 0000000",
+  "address": "12 Main Boulevard, Gulberg, Lahore", "hours": "Every day, 12:00 pm to 1:00 am", "currency": "Rs",
+  "delivery_fee": 200, "free_delivery_above": 2000,
+  "greeting": "I can show the menu, take your order, or answer questions about delivery and timings. What would you like?",
+  "offers": ["Free cola with any 2 pizzas."],
+  "catalog_label": "Menu",
+  "catalog": [
+    {"id": "margherita", "name": "Margherita Pizza", "price": 1200, "desc": "Tomato sauce, mozzarella, basil", "aliases": ["margherita", "margarita"]},
+    {"id": "pepperoni", "name": "Pepperoni Pizza", "price": 1500, "desc": "Beef pepperoni, mozzarella", "aliases": ["pepperoni"]},
+    {"id": "fajita", "name": "Fajita Pizza", "price": 1400, "desc": "Chicken fajita, peppers, onion", "aliases": ["fajita"]},
+    {"id": "bbq", "name": "BBQ Chicken Pizza", "price": 1600, "desc": "BBQ chicken, onion, cheese", "aliases": ["bbq", "barbecue"]},
+    {"id": "garlic", "name": "Garlic Bread", "price": 500, "desc": "Toasted, buttery, cheesy", "aliases": ["garlic bread", "garlic"]},
+    {"id": "fries", "name": "Fries", "price": 450, "desc": "Crispy, lightly salted", "aliases": ["fries", "french fries"]},
+    {"id": "cola", "name": "Cola (500 ml)", "price": 150, "desc": "Chilled", "aliases": ["cola", "coke", "pepsi", "drink"]}
+  ],
+  "faq": [
+    {"keys": ["delivery", "deliver", "deliveries"], "a": "Free delivery on orders above Rs 2,000, otherwise Rs 200. Usual time: 45 minutes.", "a_ur": "Rs 2,000 se upar delivery free hai, warna Rs 200. Aam taur par 45 minute lagte hain."},
+    {"keys": ["payment", "pay", "cash", "card", "bank"], "a": "Payment: cash on delivery or bank transfer."},
+    {"keys": ["vegetarian", "veg", "halal"], "a": "All our meat is halal. For vegetarian choices please order the Margherita or Garlic Bread."}
+  ],
+  "flow": {"type": "order", "record_label": "Order", "example": "2 margherita and a cola",
+    "fields": [
+      {"key": "name", "type": "text", "ask_en": "Great! What's your name?", "ask_ur": "Zabardast! Aap ka naam?"},
+      {"key": "phone", "type": "phone", "ask_en": "Your phone number?", "ask_ur": "Aap ka phone number?"},
+      {"key": "address", "type": "text", "ask_en": "Delivery address?", "ask_ur": "Delivery ka pata?"}]},
+  "role": "You are the ordering assistant of Mario's Pizza in Lahore.",
+  "goal": "Help visitors choose food, answer questions and take delivery orders.",
+  "audience": "Hungry customers, many write in Roman Urdu.",
+  "tone": "Friendly, short, clear. Reply in the customer's language.",
+  "rules": ["Answer only from the business information.", "Never invent prices, discounts, ingredients or delivery times.", "Never promise a discount that is not listed under offers."],
+  "roi": {"monthly_leads": 400, "close_rate": 30, "avg_value": 2200, "missed_pct": 25, "staff_cost": 40000}
+}

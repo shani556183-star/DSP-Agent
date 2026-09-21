@@ -1,0 +1,31 @@
+{
+  "id": "realestate", "code": "RE", "name": "Skyline Estates", "industry": "Real estate", "emoji": "🏠", "color": "#0f766e",
+  "tagline": "Find your next home. Book a viewing in one minute.", "city": "Lahore", "phone": "+92 300 2222222",
+  "address": "Office 4, Business Center, Gulberg, Lahore", "hours": "Monday to Saturday, 10:00 am to 7:00 pm", "currency": "Rs",
+  "greeting": "I can show available properties, answer basic questions and book a viewing. What are you looking for?",
+  "offers": [],
+  "catalog_label": "Properties",
+  "catalog": [
+    {"id": "house5", "name": "5 Marla House, DHA", "price": 24000000, "desc": "3 bed, 3 bath, corner house", "aliases": ["5 marla", "house", "dha"]},
+    {"id": "apt1", "name": "1 Bedroom Apartment, Gulberg", "price": 12500000, "desc": "Furnished, 6th floor", "aliases": ["apartment", "1 bedroom", "flat"]},
+    {"id": "plot10", "name": "10 Marla Plot, Bahria Town", "price": 9800000, "desc": "Possession ready", "aliases": ["plot", "10 marla", "bahria"]}
+  ],
+  "faq": [
+    {"keys": ["commission", "brokerage"], "a": "Our agent will explain commission and paperwork during the viewing. I can't quote it in chat."},
+    {"keys": ["installment", "installments", "instalment", "loan", "mortgage"], "a": "Payment plans differ by property. Book a viewing and our agent will share the options."},
+    {"keys": ["legal", "documents", "papers", "registry"], "a": "Every listing is checked by our team before viewing. Our agent will walk you through the documents in person."}
+  ],
+  "flow": {"type": "lead", "record_label": "Viewing request", "triggers": ["viewing", "visit", "see", "view", "interested", "book", "buy", "appointment"],
+    "fields": [
+      {"key": "name", "type": "text", "ask_en": "Happy to arrange a viewing. Your name?", "ask_ur": "Viewing arrange kar dete hain. Aap ka naam?"},
+      {"key": "phone", "type": "phone", "ask_en": "Your phone / WhatsApp number?", "ask_ur": "Aap ka phone / WhatsApp number?"},
+      {"key": "item", "type": "catalog", "ask_en": "Which property would you like to see?", "ask_ur": "Kaunsi property dekhni hai?"},
+      {"key": "budget", "type": "text", "ask_en": "What is your budget?", "ask_ur": "Aap ka budget kitna hai?"},
+      {"key": "when", "type": "text", "ask_en": "When would you like to visit (day and time)?", "ask_ur": "Kab visit karna chahte hain (din aur waqt)?"}]},
+  "role": "You are the assistant of Skyline Estates, a real estate agency in Lahore.",
+  "goal": "Qualify buyers and book property viewings.",
+  "audience": "Buyers and investors, some overseas Pakistanis.",
+  "tone": "Professional, warm and brief.",
+  "rules": ["Only mention properties in the catalog.", "Never invent prices, availability or legal advice.", "Book viewings; do not negotiate price."],
+  "roi": {"monthly_leads": 150, "close_rate": 4, "avg_value": 300000, "missed_pct": 40, "staff_cost": 60000}
+}

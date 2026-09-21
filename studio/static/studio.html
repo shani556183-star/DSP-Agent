@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DSP Agent Studio</title>
+<style>
+:root{--bg:#f4f6fa;--side:#0f172a;--sideink:#cbd5e1;--ink:#0f172a;--muted:#64748b;--card:#fff;--line:#e2e8f0;--brand:#2563eb;--ok:#15803d;--bad:#b91c1c;--warn:#b45309;--soft:#eef2ff}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1020;--side:#070b16;--ink:#e6ecf7;--muted:#94a3b8;--card:#141b2f;--line:#243049;--brand:#6ea0ff;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--soft:#1b2544}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;display:flex;min-height:100vh}
+aside{width:224px;background:var(--side);color:var(--sideink);padding:14px 10px;position:sticky;top:0;height:100vh;overflow:auto;flex-shrink:0}
+aside h1{font-size:16px;margin:4px 8px 12px;color:#fff}
+aside a{display:block;color:var(--sideink);text-decoration:none;padding:8px 10px;border-radius:8px;font-size:14px;cursor:pointer}
+aside a:hover{background:#1e293b}aside a.on{background:var(--brand);color:#fff}
+aside hr{border:0;border-top:1px solid #1e293b;margin:10px 4px}
+main{flex:1;padding:20px;min-width:0;max-width:1200px}
+h2{margin:0 0 4px;font-size:22px}.sub{color:var(--muted);margin:0 0 16px;font-size:14px}
+h3{margin:18px 0 8px;font-size:16px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.g2{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;overflow:auto}
+.kpi b{display:block;font-size:26px}.kpi span{color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-size:12px;font-weight:600}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.alt{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.btn.sm{padding:4px 9px;font-size:12px}.btn.red{background:var(--bad)}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 3px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.tag{display:inline-block;font-size:11px;border-radius:999px;padding:2px 9px;border:1px solid var(--line);color:var(--muted)}
+.tag.ok{color:var(--ok);border-color:var(--ok)}.tag.bad{color:var(--bad);border-color:var(--bad)}.tag.warn{color:var(--warn);border-color:var(--warn)}
+.tag.hot{background:var(--bad);color:#fff;border-color:var(--bad)}.tag.warm{background:var(--warn);color:#fff;border-color:var(--warn)}.tag.cold{background:var(--muted);color:#fff;border-color:var(--muted)}
+pre{white-space:pre-wrap;background:var(--soft);border-radius:8px;padding:10px;font:13px/1.5 ui-monospace,Consolas,monospace;margin:6px 0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13.5px}
+.tabs button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.acard{text-align:center}.acard .em{font-size:38px}.acard .btns{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.col{min-width:190px}.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);gap:10px;overflow:auto}
+.crm{background:var(--soft);border-radius:10px;padding:8px;margin-bottom:8px;font-size:13px}
+.msg{padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}.msg i{color:var(--muted);font-style:normal}
+.tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tb>*{flex:none}
+.empty{color:var(--muted);font-size:14px;padding:8px 0}
+.note{background:var(--soft);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--muted);margin:8px 0}
+@media(max-width:800px){body{display:block}aside{width:auto;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px}aside h1{width:100%}aside hr{display:none}main{padding:14px}}
+@media print{aside,.noprint{display:none!important}main{padding:0}body{display:block}}
+</style>
+</head>
+<body>
+<aside id="side"></aside>
+<main id="main"></main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => 'Rs ' + Number(n || 0).toLocaleString();
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  return r.json();
+}
+function copy(t) { if (navigator.clipboard) navigator.clipboard.writeText(t).catch(() => {}); else { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); } }
+function toast(t) { const d = document.createElement('div'); d.textContent = t; d.style.cssText = 'position:fixed;right:16px;bottom:16px;background:#0f172a;color:#fff;padding:10px 16px;border-radius:8px;z-index:99;font-size:14px'; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
+const val = id => ($(id) || {}).value;
+let AG = [], LAST_ROI = null, LAST_AUDIT = null;
+
+const NAV = [['overview', '📊 Overview'], ['gallery', '🖥️ Demo Gallery'], ['records', '🧾 Orders & Leads'], ['chats', '💬 Chats & Call-backs'], ['builder', '🛠️ Agent Builder'], ['tester', '🧪 Agent Tester'],
+  ['team', '🤝 AI Sales Team'], ['kb', '📚 Knowledge Bot (RAG)'], ['kit', '💼 Sales Kit'], ['crm', '📇 Client CRM'], ['security', '🔒 Security'], ['coverage', '✅ Class Coverage'], ['script', '🎬 Demo Script']];
+function nav(cur) {
+  $('side').innerHTML = '<h1>🤖 DSP Agent Studio</h1>' + NAV.map(([k, t]) => '<a data-go="' + k + '" class="' + (k === cur ? 'on' : '') + '">' + t + '</a>').join('') +
+    '<hr><a href="/academy" target="_blank">🎓 Academy portal</a>';
+}
+let CUR = '';
+async function go(name) {
+  CUR = name; location.hash = name; nav(name);
+  AG = await api('/api/agents');
+  $('main').innerHTML = '<p class="empty">Loading...</p>';
+  try { await (S[name] || S.overview)(); } catch (e) { $('main').innerHTML = '<div class="card">Something went wrong: ' + esc(e.message) + '</div>'; }
+  window.scrollTo(0, 0);
+}
+const bizSel = (id, all) => '<select id="' + id + '">' + (all ? '<option value="">All businesses</option>' : '') + AG.map(a => '<option value="' + a.id + '">' + a.emoji + ' ' + esc(a.name) + '</option>').join('') + '</select>';
+const head = (t, s) => '<h2>' + t + '</h2><p class="sub">' + s + '</p>';
+
+const S = {};
+// ---------------- overview ----------------
+S.overview = async () => {
+  const o = await api('/api/overview');
+  const st = ['New', 'Contacted', 'Demo shown', 'Proposal sent', 'Won', 'Lost'];
+  $('main').innerHTML = head('Overview', 'Everything the agents and the sales tools have produced.') +
+    '<div class="tb noprint" style="margin-bottom:12px"><span class="tag ' + (o.claude ? 'ok' : 'warn') + '">Brain: ' + (o.claude ? 'Claude' : 'offline engine') + '</span> <span class="tag ' + (o.whatsapp ? 'ok' : 'warn') + '">WhatsApp: ' + (o.whatsapp ? 'connected' : 'simulator only') + '</span>' +
+    '<span style="flex:1 1 auto"></span><button class="btn alt sm" data-do="seed">Load sample data</button><button class="btn alt sm" data-do="unseed">Remove sample data</button><button class="btn sm" data-go="team">Run AI Sales Team</button></div>' +
+    '<div class="grid">' + [['Businesses', o.agents.length], ['Orders / leads / bookings', o.records], ['Order revenue via chat', money(o.revenue)], ['Chat messages', o.chats], ['Open call-backs', o.open_questions], ['Pipeline value (USD)', '$' + o.crm_value.toLocaleString()], ['Won (USD)', '$' + o.crm_won.toLocaleString()]]
+      .map(([k, v]) => '<div class="card kpi"><b>' + v + '</b><span>' + k + '</span></div>').join('') + '</div>' +
+    '<h3>Businesses</h3><div class="card"><table><tr><th>Business</th><th>Type</th><th>Records</th><th>Revenue</th><th>Chats</th><th>Call-backs</th><th></th></tr>' +
+    o.agents.map(a => '<tr><td>' + a.emoji + ' <b>' + esc(a.name) + '</b></td><td>' + esc(a.industry) + ' <span class="tag">' + a.flow + '</span></td><td>' + a.records + '</td><td>' + (a.revenue ? money(a.revenue) : '-') + '</td><td>' + a.chats + '</td><td>' + a.open_q + '</td><td><a class="btn sm alt" href="/site/' + a.id + '" target="_blank">Open site</a></td></tr>').join('') + '</table></div>' +
+    '<div class="g2"><div><h3>Latest records</h3><div class="card">' + (o.latest.length ? '<table>' + o.latest.map(r => '<tr><td>' + esc(r.id) + '</td><td>' + esc(r.fields.name || '') + '</td><td>' + esc(r.biz_name) + '</td><td>' + esc(r.label) + '</td></tr>').join('') + '</table>' : '<div class="empty">Nothing yet. Chat on a demo site, or load sample data.</div>') + '</div></div>' +
+    '<div><h3>Call these first (hot leads)</h3><div class="card">' + (o.hot.length ? o.hot.map(r => '<div class="msg"><b>' + esc(r.fields.name) + '</b> ' + esc(r.fields.phone) + ' <span class="tag hot">hot ' + r.score + '</span><br><i>' + esc(r.biz_name) + ' - ' + esc(r.why.join(', ')) + '</i></div>').join('') : '<div class="empty">Run the AI Sales Team to score leads.</div>') + '</div></div></div>' +
+    '<h3>Client pipeline</h3><div class="card"><div class="row">' + st.map(s => '<div><b>' + (o.stages[s] || 0) + '</b><br><span class="tag">' + s + '</span></div>').join('') + '</div></div>';
+};
+// ---------------- gallery ----------------
+S.gallery = async () => {
+  $('main').innerHTML = head('Demo Gallery', 'Working client demos. Open a site, chat, place an order, then watch it land in Orders &amp; Leads.') +
+    '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">' + AG.map(a =>
+      '<div class="card acard"><div class="em">' + a.emoji + '</div><h3 style="margin:4px 0">' + esc(a.name) + '</h3><div class="sub" style="margin:0">' + esc(a.industry) + ' &middot; ' + esc(a.city) + '</div>' +
+      '<div style="margin-top:8px"><span class="tag">' + a.flow + ' agent</span> <span class="tag">' + a.catalog_n + ' items</span> <span class="tag">' + a.faq_n + ' FAQs</span></div>' +
+      '<div class="btns"><a class="btn sm" href="/site/' + a.id + '" target="_blank">Website + chat</a><a class="btn sm alt" href="/whatsapp/' + a.id + '" target="_blank">WhatsApp</a><button class="btn sm alt" data-do="testone" data-id="' + a.id + '">Test</button>' +
+      (a.custom ? '<button class="btn sm red" data-do="delagent" data-id="' + a.id + '">Delete</button>' : '') + '</div></div>').join('') + '</div>' +
+    '<div class="note">Voice: open a site, tap 🎤 (Chrome/Edge) and speak; tap 🔈 to hear replies. Want another business? Agent Builder makes one in minutes.</div>';
+};
+// ---------------- records ----------------
+S.records = async () => {
+  $('main').innerHTML = head('Orders &amp; Leads', 'Everything the agents collected. Change the status as your team follows up.') +
+    '<div class="row noprint"><div>' + bizSel('fb', true) + '</div><div><select id="fs"><option value="">Any status</option><option>new</option><option>contacted</option><option>done</option><option>cancelled</option></select></div><div><button class="btn alt" data-do="csv">Export CSV</button></div></div><div class="card" id="rt" style="margin-top:12px"></div>';
+  const draw = async () => {
+    let rows = await api('/api/records' + (val('fb') ? '?biz=' + val('fb') : ''));
+    if (val('fs')) rows = rows.filter(r => r.status === val('fs'));
+    window.ROWS = rows;
+    $('rt').innerHTML = rows.length ? '<table><tr><th>ID</th><th>Business</th><th>Customer</th><th>Details</th><th>Value</th><th>Score</th><th>Status</th></tr>' + rows.map(r => {
+      const f = r.fields || {}, det = r.items ? Object.entries(r.items).map(([k, v]) => v + ' x ' + esc(k)).join('<br>') + '<br><small>' + esc(f.address || '') + '</small>' : Object.entries(f).filter(([k]) => !['name', 'phone'].includes(k)).map(([k, v]) => '<small>' + esc(k) + ':</small> ' + esc(v)).join('<br>');
+      return '<tr><td>' + esc(r.id) + '<br><small class="tag">' + esc((r.time || '').slice(5, 16)) + '</small>' + (r.sample ? ' <small class="tag">sample</small>' : '') + '</td><td>' + esc(r.biz_name) + '<br><small>' + esc(r.label) + ' via ' + esc(r.channel) + '</small></td><td>' + esc(f.name) + '<br>' + esc(f.phone) + '</td><td>' + det + '</td><td>' + (r.total ? money(r.total) : '-') + '</td><td>' +
+        (r.label_score ? '<span class="tag ' + r.label_score + '">' + r.label_score + ' ' + r.score + '</span>' : '<span class="tag">not scored</span>') + '</td><td><select data-do="status" data-id="' + r.id + '" style="width:auto">' + ['new', 'contacted', 'done', 'cancelled'].map(s => '<option' + (s === r.status ? ' selected' : '') + '>' + s + '</option>').join('') + '</select></td></tr>';
+    }).join('') + '</table>' : '<div class="empty">No records. Place an order on a demo site or load sample data from Overview.</div>';
+  };
+  $('fb').onchange = draw; $('fs').onchange = draw; draw();
+};
+// ---------------- chats ----------------
+S.chats = async () => {
+  const [qs, ch] = [await api('/api/questions'), await api('/api/chats')];
+  $('main').innerHTML = head('Chats &amp; Call-backs', 'Questions the agents could not answer are never guessed. They wait here for a human call-back.') +
+    '<div class="g2"><div><h3>Call-back list <span class="tag ' + (qs.filter(q => !q.resolved).length ? 'warn' : 'ok') + '">' + qs.filter(q => !q.resolved).length + ' open</span></h3><div class="card">' +
+    (qs.length ? qs.map(q => '<div class="msg"><b>' + esc(q.question) + '</b><br><i>' + esc(q.biz_name) + ' &middot; ' + esc((q.time || '').slice(5, 16)) + '</i> ' + (q.resolved ? '<span class="tag ok">resolved</span>' : '<button class="btn sm" data-do="resolve" data-id="' + q.id + '">Mark resolved</button>') + '</div>').join('') : '<div class="empty">No unanswered questions yet.</div>') +
+    '</div></div><div><h3>Recent chats</h3><div class="card">' + (ch.length ? ch.slice(0, 40).map(c => '<div class="msg"><b>' + esc(c.user) + '</b><br><i>' + esc(c.bot.slice(0, 160)) + '</i><br><span class="tag">' + esc(c.biz) + '</span> <span class="tag">' + esc(c.channel) + '</span> <span class="tag">' + esc(c.mode) + '</span></div>').join('') : '<div class="empty">No chats yet.</div>') + '</div></div></div>';
+};
+// ---------------- builder ----------------
+const TEMPLATE = {name: 'Glow Salon', industry: 'Beauty salon', emoji: '💇', color: '#be185d', tagline: 'Book your hair and beauty appointment in a minute', city: 'Lahore', phone: '+92 300 5555555', address: 'DHA Phase 5, Lahore', hours: 'Every day, 11 am to 9 pm', flow: 'booking', greeting: 'I can show our services and book your appointment.',
+  catalog: 'Haircut | 1500 | Wash and style\nHair colour | 6000 | Full colour\nFacial | 3500 | Deep cleansing', faq: 'bridal, wedding: We do bridal packages. Our team will call you with details.\nwalk-in, walkin: Walk-ins are welcome, but appointments get priority.', offers: '', rules: 'Never confirm a time slot; the salon confirms by phone.\nNever invent prices.'};
+S.builder = async () => {
+  $('main').innerHTML = head('Agent Builder', 'Any business: fill the form, get a website, chatbot and dashboard instantly. This is the "agent for any client in 10 minutes" tool.') +
+    '<div class="g2"><div class="card"><div class="row"><div><label>Business name</label><input id="b_name"></div><div><label>Industry</label><input id="b_industry"></div></div>' +
+    '<div class="row"><div><label>Emoji</label><input id="b_emoji"></div><div><label>Brand colour</label><input id="b_color" type="color" value="#2563eb"></div><div><label>What should the agent take?</label><select id="b_flow"><option value="order">Orders (cart + delivery)</option><option value="booking">Bookings / appointments</option><option value="lead" selected>Leads / enquiries</option></select></div></div>' +
+    '<label>Tagline</label><input id="b_tagline"><div class="row"><div><label>City</label><input id="b_city"></div><div><label>Phone</label><input id="b_phone"></div></div><label>Address</label><input id="b_address"><label>Opening hours</label><input id="b_hours">' +
+    '<label>Greeting</label><input id="b_greeting"><label>Items / services (one per line: Name | price | description)</label><textarea id="b_catalog"></textarea>' +
+    '<label>FAQ (one per line: keywords, separated by commas : answer)</label><textarea id="b_faq"></textarea><label>Offers (one per line, leave empty if none)</label><textarea id="b_offers" style="min-height:50px"></textarea>' +
+    '<label>Rules (one per line)</label><textarea id="b_rules"></textarea><div class="row noprint" style="margin-top:12px"><button class="btn" data-do="build">Create agent + website</button><button class="btn alt" data-do="fillsample">Fill with a sample (salon)</button></div></div>' +
+    '<div><div class="card"><h3 style="margin-top:0">The agent\'s job description (live preview)</h3><p class="sub">Role, Goal, Audience, Tone, Rules: the formula from class.</p><pre id="prev"></pre></div><div id="built"></div></div></div>';
+  const keys = ['name', 'industry', 'emoji', 'color', 'tagline', 'city', 'phone', 'address', 'hours', 'greeting', 'catalog', 'faq', 'offers', 'rules', 'flow'];
+  const prev = () => { const n = val('b_name') || 'the business'; $('prev').textContent = 'ROLE: You are the assistant of ' + n + '.\nGOAL: Answer questions and take ' + val('b_flow') + ' requests.\nAUDIENCE: Customers of ' + n + '.\nTONE: Friendly, short, clear. Reply in the customer\'s language.\nRULES:\n' + ((val('b_rules') || 'Answer only from the business information.\nNever invent prices or facts; say you do not know and offer a call back.').split('\n').map(x => '- ' + x).join('\n')) + '\n\n(+ business facts, items and FAQ below the line, one source of truth)'; };
+  keys.forEach(k => { $('b_' + k).oninput = prev; $('b_' + k).onchange = prev; }); prev();
+};
+// ---------------- tester ----------------
+S.tester = async () => {
+  $('main').innerHTML = head('Agent Tester', 'Class Day 5: test before you deliver. Each agent is asked its FAQs, prices, a discount trap, off-topic and prompt-injection questions, and a full order/booking.') +
+    '<div class="row noprint"><div>' + bizSel('tb', true) + '</div><div><button class="btn" data-do="runtest">Run tests</button></div></div><div id="tres" style="margin-top:12px"></div>';
+};
+// ---------------- team ----------------
+S.team = async () => {
+  const [dr] = [await api('/api/drafts')];
+  $('main').innerHTML = head('AI Sales Team', 'Three agents share the same records: <b>Qualifier</b> scores each lead, <b>Follow-up writer</b> drafts a message, <b>Manager</b> writes the daily digest. Nothing is ever sent automatically: every message is a draft for a human.') +
+    '<div class="row noprint"><button class="btn" data-do="runteam">Run the team on new records</button></div><div id="teamres" style="margin-top:12px">' + teamHtml(null, dr) + '</div>';
+};
+function teamHtml(t, drafts) {
+  return (t ? '<div class="note"><b>Manager digest</b><br>' + t.digest.map(esc).join('<br>') + '<br><small>Processed ' + t.processed + ' new records.</small></div>' : '') +
+    '<div class="g2">' + (t ? '<div><h3>Qualified records</h3><div class="card"><table><tr><th>ID</th><th>Customer</th><th>Score</th><th>Why</th></tr>' + t.records.map(r => '<tr><td>' + esc(r.id) + '</td><td>' + esc(r.name) + '<br><small>' + esc(r.biz) + '</small></td><td><span class="tag ' + r.label + '">' + r.label + ' ' + r.score + '</span></td><td><small>' + esc(r.why.join(', ')) + '</small></td></tr>').join('') + '</table></div></div>' : '') +
+    '<div><h3>Follow-up drafts (need a human to approve)</h3><div class="card">' + (drafts.length ? drafts.slice(0, 20).map(d => '<div class="msg"><b>To ' + esc(d.to) + '</b> ' + esc(d.phone) + '<br>' + esc(d.text) + '<br><span class="tag warn">' + esc(d.status) + '</span> <button class="btn sm alt" data-do="copy" data-t="' + esc(d.text) + '">Copy</button></div>').join('') : '<div class="empty">No drafts yet. Load sample data or chat with a demo, then run the team.</div>') + '</div></div></div>';
+}
+// ---------------- knowledge bot ----------------
+const EXAMPLE_DOC = 'The AI Agent Bootcamp runs for five days, Monday to Friday, live online.\n\nDay one covers what AI is and the agent formula: Claude as the brain, a job description, tools and a loop.\n\nDay two is about writing the job description with role, goal, audience, tone and rules.\n\nDay three covers memory and context. Keep every fact in one place so prices never conflict.\n\nDay four is building your first agent with Claude Code and pushing the project to GitHub.\n\nDay five is testing, securing and deploying. API keys must stay in a .env file and never be uploaded.\n\nThe course is for complete beginners and needs no coding. A laptop with internet and a free Claude account are enough.';
+S.kb = async () => {
+  const docs = await api('/api/kb');
+  $('main').innerHTML = head('Knowledge Bot (RAG)', 'Class 22-23 Aug: the agent does not memorise everything. It searches your documents, fetches only the relevant slice, and answers only from it. If the answer is not there, it says so.') +
+    '<div class="g2"><div class="card"><label>Document title</label><input id="k_t" placeholder="e.g. Price list / Policies / FAQ"><label>Paste the text</label><textarea id="k_x" style="min-height:160px"></textarea><div class="row noprint" style="margin-top:10px"><button class="btn" data-do="kbadd">Add document</button><button class="btn alt" data-do="kbex">Use an example</button></div>' +
+    '<h3>Documents (' + docs.length + ')</h3>' + (docs.length ? docs.map(d => '<div class="msg"><b>' + esc(d.title) + '</b> <small>' + d.text.length + ' chars</small> <button class="btn sm red" data-do="kbdel" data-id="' + d.id + '">Delete</button></div>').join('') : '<div class="empty">No documents yet.</div>') + '</div>' +
+    '<div class="card"><label>Ask a question</label><input id="k_q" placeholder="e.g. What happens on day four?"><div class="row noprint" style="margin-top:10px"><button class="btn" data-do="kbask">Ask</button></div><div id="k_a" style="margin-top:12px"></div></div></div>';
+};
+// ---------------- sales kit ----------------
+let KIT = 'finder';
+S.kit = async () => {
+  const tabs = [['finder', 'Client Finder'], ['email', 'Cold Email'], ['roi', 'ROI Calculator'], ['audit', 'Website Audit'], ['proposal', 'Proposal'], ['pricing', 'Pricing']];
+  $('main').innerHTML = head('Sales Kit', 'Teacher (27 Aug): sell outcomes, find clients yourself, show the money saved and earned.') +
+    '<div class="tabs noprint">' + tabs.map(([k, t]) => '<button data-do="kit" data-k="' + k + '" class="' + (k === KIT ? 'on' : '') + '">' + t + '</button>').join('') + '</div><div id="kitbody"></div>';
+  KITS[KIT]();
+};
+const KITS = {
+  finder() {
+    $('kitbody').innerHTML = '<div class="card"><div class="row"><div><label>Country</label><input id="f_c" value="Pakistan"></div><div><label>City</label><input id="f_ci" value="Lahore"></div><div><label>Type of business</label><input id="f_i" value="restaurants"></div></div><div class="row noprint" style="margin-top:10px"><button class="btn" data-do="finder">Generate</button></div></div><div id="fres"></div>';
+  },
+  email() {
+    $('kitbody').innerHTML = '<div class="card"><div class="row"><div><label>Owner / contact name</label><input id="e_c" placeholder="e.g. Mr Ahmed"></div><div><label>Business name</label><input id="e_b" placeholder="e.g. Al-Noor Restaurant"></div><div><label>Industry</label><input id="e_i" value="restaurant"></div></div>' +
+      '<div class="row"><div><label>Their problem</label><select id="e_p"><option value="missed">Customers message after hours, no reply</option><option value="slow">Slow replies, buyers go elsewhere</option><option value="repeat">Staff repeat the same questions</option><option value="noweb">No website that takes orders</option></select></div><div><label>Outcome you promise</label><input id="e_o" placeholder="no enquiry is lost and orders come in while you sleep"></div></div>' +
+      '<div class="row"><div><label>Your name</label><input id="e_m"></div><div><label>Your company</label><input id="e_g"></div></div><div class="row noprint" style="margin-top:10px"><button class="btn" data-do="email">Write the messages</button></div></div><div id="eres"></div>';
+  },
+  roi() {
+    $('kitbody').innerHTML = '<div class="card"><div class="row"><div><label>Start from a business template</label>' + bizSel('r_b') + '</div></div><div class="row"><div><label>Leads / month</label><input id="r_l" type="number"></div><div><label>Close rate %</label><input id="r_c" type="number"></div><div><label>Avg sale (Rs)</label><input id="r_v" type="number"></div><div><label>Leads missed today %</label><input id="r_m" type="number"></div></div>' +
+      '<div class="row"><div><label>Agent recovers % of missed</label><input id="r_r" type="number" value="60"></div><div><label>Staff cost / month (Rs)</label><input id="r_s" type="number"></div><div><label>Staff time saved %</label><input id="r_sp" type="number" value="40"></div></div>' +
+      '<div class="row"><div><label>Your setup price (Rs)</label><input id="r_p" type="number" value="140000"></div><div><label>Monthly fee (Rs)</label><input id="r_f" type="number" value="20000"></div></div><div class="row noprint" style="margin-top:10px"><button class="btn" data-do="roi">Calculate</button></div>' +
+      '<div class="note">Defaults are placeholders. Replace them with the client\'s real numbers, and be honest: a client who trusts your numbers stays.</div></div><div id="rres"></div>';
+    const fill = async () => { const a = await api('/api/agents/' + val('r_b')); const r = a.roi || {}; $('r_l').value = r.monthly_leads; $('r_c').value = r.close_rate; $('r_v').value = r.avg_value; $('r_m').value = r.missed_pct; $('r_s').value = r.staff_cost; };
+    $('r_b').onchange = fill; fill();
+  },
+  audit() {
+    $('kitbody').innerHTML = '<div class="card"><label>Client website address</label><div class="row"><input id="a_u" placeholder="example.com" style="flex:3"><button class="btn noprint" data-do="audit" style="flex:1">Run audit</button></div><div class="note">Free hook: send the client the top problems this finds, then offer the fix. Needs internet.</div></div><div id="ares"></div>';
+  },
+  proposal() {
+    const r = LAST_ROI;
+    $('kitbody').innerHTML = '<div class="card noprint"><div class="row"><div><label>Client name</label><input id="p_c"></div><div><label>Business</label><input id="p_b"></div><div><label>Package</label><select id="p_k"><option value="0">Starter</option><option value="1" selected>Growth</option><option value="2">Pro</option></select></div></div>' +
+      '<div class="row"><div><label>Your name / company</label><input id="p_m"></div><div><label>Currency</label><input id="p_cur" value="USD"></div></div><div class="note">' + (r ? 'ROI numbers from your last calculation will be included.' : 'Tip: run the ROI Calculator first to include real numbers.') + '</div><button class="btn" data-do="proposal">Build proposal</button></div><div id="pres"></div>';
+  },
+  pricing() {
+    $('kitbody').innerHTML = '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">' + PKG.map(p => '<div class="card"><h3 style="margin-top:0">' + p.n + '</h3><div style="font-size:26px;font-weight:800">$' + p.p.toLocaleString() + '</div><div class="sub">setup &middot; then about $' + p.m + '/month care</div><ul style="padding-left:18px;margin:0;font-size:14px">' + p.i.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>').join('') + '</div>' +
+      '<div class="note">Class reference (7 Jul): a restaurant agent sells for roughly $500 to $5,000. These three packages and the monthly care fee are <b>my suggestion</b>, not the teacher\'s. Adjust to your market, and charge more when the ROI is bigger.</div>';
+  }
+};
+const PKG = [{n: 'Starter', p: 500, m: 100, i: ['Business website', 'FAQ chatbot from your business file', 'Call-back list for unanswered questions', 'One channel (website)']},
+  {n: 'Growth', p: 1500, m: 200, i: ['Everything in Starter', 'Ordering / booking / lead agent', 'Owner dashboard with records', 'WhatsApp channel (Meta setup)', 'Testing report before launch']},
+  {n: 'Pro', p: 3000, m: 300, i: ['Everything in Growth', 'Knowledge Bot (RAG) on your documents', 'Voice agent', 'AI Sales Team: scoring + follow-up drafts', 'Monthly improvement report']}];
+// ---------------- crm ----------------
+const STAGES = ['New', 'Contacted', 'Demo shown', 'Proposal sent', 'Won', 'Lost'];
+S.crm = async () => {
+  const rows = await api('/api/crm');
+  $('main').innerHTML = head('Client CRM', 'Track every prospect from first message to paid client (the teacher watches 283 clients this way).') +
+    '<div class="card noprint"><div class="row"><div><label>Business</label><input id="c_n"></div><div><label>Industry</label><input id="c_i"></div><div><label>Contact</label><input id="c_c"></div><div><label>Value (USD)</label><input id="c_v" type="number"></div><div><label>Source</label><input id="c_s" placeholder="Cold email, Google, referral"></div></div><label>Notes</label><input id="c_no"><div style="margin-top:10px"><button class="btn" data-do="crmadd">Add prospect</button></div></div>' +
+    '<h3>Pipeline</h3><div class="board">' + STAGES.map((s, si) => '<div class="col"><b>' + s + '</b> <span class="tag">' + rows.filter(r => r.stage === s).length + '</span><div style="margin-top:8px">' + rows.filter(r => r.stage === s).map(r =>
+      '<div class="crm"><b>' + esc(r.name) + '</b>' + (r.sample ? ' <span class="tag">sample</span>' : '') + '<br>' + esc(r.industry) + (r.value ? ' &middot; $' + Number(r.value).toLocaleString() : '') + '<br><small>' + esc(r.notes) + '</small><br>' +
+      (si > 0 ? '<button class="btn sm alt" data-do="crmmove" data-id="' + r.id + '" data-s="' + STAGES[si - 1] + '">&larr;</button> ' : '') + (si < STAGES.length - 1 ? '<button class="btn sm alt" data-do="crmmove" data-id="' + r.id + '" data-s="' + STAGES[si + 1] + '">&rarr;</button> ' : '') + '<button class="btn sm red" data-do="crmdel" data-id="' + r.id + '">x</button></div>').join('') + '</div></div>').join('') + '</div>';
+};
+// ---------------- security ----------------
+S.security = async () => {
+  $('main').innerHTML = head('Security &amp; launch checks', 'Class Day 5 and 21 Aug: keys stay in .env, nothing secret on GitHub, test before deploy. This scans the real project files.') + '<div class="card" id="sec">Scanning...</div><div class="note">Before going live: host it (Vercel/Render), put a login on this dashboard, keep keys only in the host\'s environment settings, and run the Agent Tester again.</div>';
+  const r = await api('/api/security');
+  $('sec').innerHTML = '<table>' + r.map(x => '<tr><td style="width:70px"><span class="tag ' + (x.ok ? 'ok' : 'bad') + '">' + (x.ok ? 'PASS' : 'ACTION') + '</span></td><td>' + esc(x.check) + '<br><small style="color:var(--muted)">' + esc(x.fix) + '</small></td></tr>').join('') + '</table>';
+};
+// ---------------- coverage ----------------
+S.coverage = async () => {
+  const rows = await api('/api/coverage'), c = {}; rows.forEach(r => c[r.status] = (c[r.status] || 0) + 1);
+  const tone = {built: 'ok', partial: 'warn', 'needs key': 'warn', todo: 'bad'};
+  $('main').innerHTML = head('Class coverage', 'What the teacher taught versus what exists in this Studio. Honest status, so nothing is oversold to a client.') +
+    '<div class="row" style="margin-bottom:10px">' + Object.entries(c).map(([k, v]) => '<span class="tag ' + (tone[k] || '') + '">' + v + ' ' + k + '</span>').join(' ') + '</div><div class="card"><table><tr><th>Taught</th><th>When</th><th>What we built</th><th>Where</th><th>Status</th></tr>' +
+    rows.map(r => '<tr><td>' + esc(r.item) + '</td><td>' + esc(r.when) + '</td><td>' + esc(r.what) + '</td><td>' + esc(r.where) + '</td><td><span class="tag ' + (tone[r.status] || '') + '">' + r.status + '</span></td></tr>').join('') + '</table></div>';
+};
+// ---------------- demo script ----------------
+S.script = async () => {
+  $('main').innerHTML = head('Demo script for the client meeting', 'A 10-minute flow. Sell the result, not the technology (teacher, 27 Aug).') +
+    '<div class="g2"><div class="card"><h3 style="margin-top:0">Before the meeting</h3><ol><li>Start the server: <code>python studio/server.py</code>, open http://127.0.0.1:8000</li><li>Overview &rarr; <b>Load sample data</b> so the dashboard is not empty (remove it after).</li><li>Overview &rarr; <b>Run AI Sales Team</b> so scores and drafts are ready.</li><li>Agent Tester &rarr; run all: show 100%.</li><li>Open the client\'s closest demo site on your phone and laptop; test the mic in Chrome.</li><li>Prepare their ROI numbers (Sales Kit &rarr; ROI) and a proposal.</li></ol></div>' +
+    '<div class="card"><h3 style="margin-top:0">The 10 minutes</h3><ol><li><b>Their pain (1 min):</b> "How many customers message after closing? What happens to them?"</li><li><b>Website + chat (2 min):</b> ask price, order/book something as a customer.</li><li><b>Dashboard (1 min):</b> the order/booking appears in Orders &amp; Leads.</li><li><b>Honesty (1 min):</b> ask something it cannot know: it says so and adds a call-back. "It never invents prices."</li><li><b>WhatsApp + voice (1 min):</b> same agent on WhatsApp; speak to it.</li><li><b>ROI (2 min):</b> show the money saved and earned with their numbers.</li><li><b>Close (2 min):</b> offer a package, print the proposal, agree next step.</li></ol></div></div>' +
+    '<h3>If the client says...</h3><div class="card"><table>' + [['"AI will say wrong things."', 'Show the Tester: it answers only from your business file, refuses discounts and off-topic, and logs what it does not know.'], ['"Is my data safe?"', 'Keys live in .env, never in code or GitHub; the Security page proves it. Add login and hosting before go-live.'], ['"We already have staff."', 'The agent takes the repeated questions and after-hours messages. Show the staff time saved in the ROI.'], ['"It is too expensive."', 'Compare with one lost customer per week (ROI page). Offer Starter first.'], ['"What if it cannot answer?"', 'It says so, notes the question and your team calls back. Nothing is guessed.'], ['"Will it work on WhatsApp?"', 'Yes: same brain. Meta setup takes a couple of days (class 3 Sep). Today: the simulator.']]
+      .map(([q, a]) => '<tr><td style="width:30%"><b>' + esc(q) + '</b></td><td>' + esc(a) + '</td></tr>').join('') + '</table></div><div class="note">Do not promise anything the Coverage page marks partial or needs key (real WhatsApp, ElevenLabs voice, Claude brain without your API key).</div>';
+};
+
+// ---------------- actions ----------------
+const ACT = {
+  async seed() { toast((await api('/api/seed', {})).message); go('overview'); },
+  async unseed() { toast((await api('/api/reset_samples', {})).message); go('overview'); },
+  async status(b) { await api('/api/records/status', {id: b.dataset.id, status: b.value}); toast('Status updated'); },
+  async resolve(b) { await api('/api/questions/resolve', {id: b.dataset.id}); go('chats'); },
+  csv() {
+    const rows = window.ROWS || []; const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const out = [['id', 'business', 'type', 'name', 'phone', 'details', 'total', 'score', 'status', 'time'].join(',')].concat(rows.map(r => [r.id, r.biz_name, r.label, (r.fields || {}).name, (r.fields || {}).phone, r.items ? JSON.stringify(r.items) : JSON.stringify(r.fields), r.total || '', r.score || '', r.status, r.time].map(q).join(',')));
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([out.join('\n')], {type: 'text/csv'})); a.download = 'records.csv'; a.click();
+  },
+  async delagent(b) { if (confirm('Delete this custom agent?')) { await api('/api/agents/delete', {id: b.dataset.id}); go('gallery'); } },
+  testone(b) { go('tester').then(() => { $('tb').value = b.dataset.id; ACT.runtest(); }); },
+  fillsample() { Object.entries(TEMPLATE).forEach(([k, v]) => { const e = $('b_' + k); if (e) { e.value = v; e.dispatchEvent(new Event('input')); } }); },
+  async build() {
+    const d = {}; ['name', 'industry', 'emoji', 'color', 'tagline', 'city', 'phone', 'address', 'hours', 'greeting', 'catalog', 'faq', 'offers', 'rules', 'flow'].forEach(k => d[k] = val('b_' + k));
+    if (!d.name) return toast('Enter a business name');
+    const r = await api('/api/agents', d);
+    $('built').innerHTML = r.ok ? '<div class="card" style="margin-top:12px"><b>Created ' + esc(r.config.name) + '.</b><div class="row" style="margin-top:8px"><a class="btn" href="/site/' + r.id + '" target="_blank">Open website + chat</a><a class="btn alt" href="/whatsapp/' + r.id + '" target="_blank">WhatsApp view</a></div><p class="sub" style="margin-top:8px">Run the Agent Tester on it before showing a client.</p></div>' : '<div class="note">' + esc(r.error) + '</div>';
+  },
+  async runtest() {
+    $('tres').innerHTML = '<p class="empty">Running...</p>';
+    const res = await api('/api/test', {biz: val('tb')});
+    $('tres').innerHTML = res.map(r => '<div class="card" style="margin-bottom:12px"><div class="row" style="align-items:center"><b style="flex:2">' + esc(r.name) + '</b><span class="tag ' + (r.score === 100 ? 'ok' : 'bad') + '">' + r.passed + '/' + r.total + ' passed</span><div class="bar" style="flex:3"><i style="width:' + r.score + '%"></i></div></div><table style="margin-top:8px">' +
+      r.cases.map(c => '<tr><td style="width:64px"><span class="tag ' + (c.ok ? 'ok' : 'bad') + '">' + (c.ok ? 'PASS' : 'FAIL') + '</span></td><td>' + esc(c.name) + '<br><small style="color:var(--muted)">' + esc(c.detail) + '</small></td></tr>').join('') + '</table></div>').join('');
+  },
+  async runteam() { const t = await api('/api/team/run', {}); const d = await api('/api/drafts'); $('teamres').innerHTML = teamHtml(t, d); },
+  copy(b) { copy(b.dataset.t); toast('Copied'); },
+  async kbadd() { const r = await api('/api/kb/add', {title: val('k_t'), text: val('k_x')}); if (r.error) toast(r.error); else go('kb'); },
+  kbex() { $('k_t').value = 'AI Agent Bootcamp FAQ'; $('k_x').value = EXAMPLE_DOC; },
+  async kbdel(b) { await api('/api/kb/delete', {id: b.dataset.id}); go('kb'); },
+  async kbask() {
+    const q = val('k_q'); if (!q) return;
+    const r = await api('/api/kb/ask', {question: q});
+    $('k_a').innerHTML = '<div class="note" style="background:' + (r.grounded ? 'var(--soft)' : 'transparent') + '"><span class="tag ' + (r.grounded ? 'ok' : 'warn') + '">' + (r.grounded ? 'grounded in your documents' : 'not in documents: not guessed') + '</span> <span class="tag">' + r.mode + '</span><p style="color:var(--ink);font-size:15px">' + esc(r.answer) + '</p></div>' +
+      (r.sources.length ? '<h3>Retrieved slices</h3>' + r.sources.map(s => '<div class="msg"><b>' + esc(s.title) + '</b> <span class="tag">score ' + s.score + '</span><br><i>' + esc(s.text) + '</i></div>').join('') : '');
+  },
+  kit(b) { KIT = b.dataset.k; S.kit(); },
+  async finder() {
+    const r = await api('/api/finder', {country: val('f_c'), city: val('f_ci'), industry: val('f_i')});
+    $('fres').innerHTML = '<h3>1. Prompt to paste into Claude (research)</h3><pre>' + esc(r.prompt) + '</pre><button class="btn sm alt" data-do="copy" data-t="' + esc(r.prompt) + '">Copy prompt</button>' +
+      '<h3>2. Google searches</h3><div class="card">' + r.queries.map(q => '<div class="msg"><a href="https://www.google.com/search?q=' + encodeURIComponent(q) + '" target="_blank" rel="noopener">' + esc(q) + '</a></div>').join('') + '</div>' +
+      '<h3>3. Ten ways to find clients (class 27 Aug)</h3><div class="card"><table>' + r.channels.map((c, i) => '<tr><td style="width:30px">' + (i + 1) + '</td><td><b>' + esc(c.name) + '</b><br><small style="color:var(--muted)">' + esc(c.how) + '</small></td></tr>').join('') + '</table></div>';
+  },
+  async email() {
+    const r = await api('/api/coldemail', {contact: val('e_c'), business: val('e_b'), industry: val('e_i'), pain: val('e_p'), outcome: val('e_o'), me: val('e_m'), org: val('e_g')});
+    const blk = (t, x) => '<h3>' + t + ' <button class="btn sm alt" data-do="copy" data-t="' + esc(x) + '">Copy</button></h3><pre>' + esc(x) + '</pre>';
+    $('eres').innerHTML = blk('Email (English)', r.email_en) + blk('Email (Roman Urdu)', r.email_ur) + blk('LinkedIn DM', r.dm) + blk('WhatsApp message', r.whatsapp) + blk('Follow-up after 3 days', r.followup) + '<div class="note"><b>Rules from class:</b><br>' + r.tips.map(esc).join('<br>') + '</div>';
+  },
+  async roi() {
+    const d = {monthly_leads: val('r_l'), close_rate: val('r_c'), avg_value: val('r_v'), missed_pct: val('r_m'), recover_pct: val('r_r'), staff_cost: val('r_s'), staff_saved_pct: val('r_sp'), setup_price: val('r_p'), monthly_fee: val('r_f')};
+    const r = await api('/api/roi', d); LAST_ROI = {...r, inputs: d};
+    $('rres').innerHTML = '<div class="grid" style="margin-top:12px">' + [['Extra sales / month', money(r.extra_revenue)], ['Staff cost saved / month', money(r.staff_savings)], ['Total benefit / month', money(r.monthly_benefit)], ['Net after your fee', money(r.net_monthly)], ['Payback', r.payback_months == null ? 'n/a' : r.payback_months + ' months'], ['First-year gain', money(r.yearly_benefit)], ['Lost right now / month', money(r.lost_now)]].map(([k, v]) => '<div class="card kpi"><b>' + v + '</b><span>' + k + '</span></div>').join('') + '</div><div class="note" style="font-size:15px;color:var(--ink)">' + esc(r.sentence) + '</div>';
+  },
+  async audit() {
+    $('ares').innerHTML = '<p class="empty">Checking the site...</p>';
+    const r = await api('/api/audit', {url: val('a_u')}); LAST_AUDIT = r;
+    if (r.error) { $('ares').innerHTML = '<div class="note">' + esc(r.error) + '</div>'; return; }
+    $('ares').innerHTML = '<div class="card" style="margin-top:12px"><div class="row" style="align-items:center"><b style="font-size:30px;flex:0">' + r.score + '</b><div class="bar" style="flex:3"><i style="width:' + r.score + '%"></i></div><span class="tag">' + r.seconds + ' s load</span></div><table style="margin-top:10px">' +
+      r.checks.map(c => '<tr><td style="width:64px"><span class="tag ' + (c.ok ? 'ok' : 'bad') + '">' + (c.ok ? 'OK' : 'FIX') + '</span></td><td>' + esc(c.check) + '<br><small style="color:var(--muted)">' + esc(c.why) + '</small></td></tr>').join('') + '</table></div><h3>Message to send the client <button class="btn sm alt" data-do="copy" data-t="' + esc(r.pitch) + '">Copy</button></h3><pre>' + esc(r.pitch) + '</pre><button class="btn sm" data-do="audit2crm">Add to CRM</button>';
+  },
+  async audit2crm() { await api('/api/crm/add', {name: (LAST_AUDIT.url || '').replace(/^https?:\/\//, '').slice(0, 60), industry: 'Audited site', source: 'Website audit', stage: 'New', notes: 'Audit score ' + LAST_AUDIT.score}); toast('Added to CRM'); },
+  proposal() {
+    const p = PKG[+val('p_k')], cur = val('p_cur') || 'USD', r = LAST_ROI;
+    $('pres').innerHTML = '<div class="card" style="margin-top:12px;background:#fff;color:#111"><div class="noprint" style="text-align:right"><button class="btn sm" onclick="window.print()">Print / Save as PDF</button></div>' +
+      '<h2 style="color:#111">Proposal for ' + esc(val('p_b') || 'your business') + '</h2><p>Prepared for ' + esc(val('p_c') || 'the owner') + ' by ' + esc(val('p_m') || 'us') + ' on ' + new Date().toLocaleDateString() + '</p>' +
+      '<h3 style="color:#111">The problem</h3><p>Customers message when nobody can answer. Every unanswered message is a lost sale, and your staff repeat the same answers all day.</p>' +
+      '<h3 style="color:#111">The result you get</h3><p>An assistant on your website (and WhatsApp) that answers instantly, takes the order or booking, and only asks your team when it is unsure. It never invents prices. Your owner dashboard shows every order and every question to follow up.</p>' +
+      (r ? '<h3 style="color:#111">What it is worth</h3><p>' + esc(r.sentence) + '</p><p>Estimated benefit: <b>' + money(r.monthly_benefit) + ' per month</b>' + (r.payback_months != null ? ', paying back in about <b>' + r.payback_months + ' months</b>' : '') + '. These are estimates based on your own numbers.</p>' : '') +
+      '<h3 style="color:#111">Package: ' + p.n + '</h3><ul>' + p.i.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p><b>Investment: ' + esc(cur) + ' ' + p.p.toLocaleString() + '</b> one-time, then about ' + esc(cur) + ' ' + p.m + ' per month for care and improvements.</p>' +
+      '<h3 style="color:#111">How we work</h3><ol><li>Free 10-minute demo (done)</li><li>You share menu / services, prices and FAQs</li><li>We build, test with 100+ questions, and show you</li><li>Go live, then monthly review</li></ol><p style="font-size:12px;color:#555">Prices and estimates are indicative. Agents answer only from information you provide.</p></div>';
+  },
+  async crmadd() { if (!val('c_n')) return toast('Enter the business name'); await api('/api/crm/add', {name: val('c_n'), industry: val('c_i'), contact: val('c_c'), value: val('c_v'), source: val('c_s'), notes: val('c_no')}); go('crm'); },
+  async crmmove(b) { await api('/api/crm/update', {id: b.dataset.id, stage: b.dataset.s}); go('crm'); },
+  async crmdel(b) { await api('/api/crm/delete', {id: b.dataset.id}); go('crm'); }
+};
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); return go(g.dataset.go); }
+  const b = e.target.closest('[data-do]'); if (b && b.tagName !== 'SELECT' && ACT[b.dataset.do]) ACT[b.dataset.do](b);
+});
+document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.do === 'status') ACT.status(e.target); });
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (S[h] && h !== CUR) go(h); });
+go(S[location.hash.slice(1)] ? location.hash.slice(1) : 'overview');
+</script>
+</body>
+</html>

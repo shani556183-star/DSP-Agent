@@ -7,3 +7,6 @@ __pycache__/
 out/*.tmp
 demo/data/
 demo/server.log
+studio/data/
+studio/server.log
+studio/.env

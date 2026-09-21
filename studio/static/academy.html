@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Academy</title>
+<style>
+:root{--bg:#f5f7fb;--ink:#14213d;--muted:#5b6b86;--card:#fff;--line:#dfe5f0;--brand:#1f5fbf;--ok:#15803d}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1420;--ink:#e8edf7;--muted:#9fb0cc;--card:#182036;--line:#26314d;--brand:#5b9bff;--ok:#4ade80}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+h1{margin:0;font-size:24px}a{color:var(--brand)}
+.bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:12px 0 4px}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.formula{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.formula div{background:var(--bg);border-radius:10px;padding:10px;font-size:14px}.formula b{display:block;color:var(--brand)}
+.day{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden}
+.day h2{margin:0;padding:12px 14px;font-size:17px;display:flex;justify-content:space-between;cursor:pointer}
+.day .body{padding:0 14px 12px}
+.day small{color:var(--muted);font-weight:400}
+label{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
+label span{flex:1}label em{color:var(--muted);font-style:normal;font-size:13px;display:block}
+input[type=checkbox]{margin-top:5px;width:18px;height:18px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+#cert{display:none;background:#fff;color:#111;border:6px double #b8860b;border-radius:10px;padding:28px;text-align:center;margin:16px 0}
+@media print{body *{visibility:hidden}#cert,#cert *{visibility:visible}#cert{position:absolute;left:0;top:0;width:100%;display:block}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>🎓 Agent Academy</h1><div><a href="/">&larr; Agent Studio</a></div></header>
+  <p style="color:var(--muted)">The bootcamp path from class notes: build, test, deploy and sell your first AI agent. Tick each lesson as you finish it; progress saves in your browser.</p>
+  <div class="bar"><i id="bar"></i></div><div id="pct" style="font-size:13px;color:var(--muted)"></div>
+  <div class="formula">
+    <div><b>Brain</b>Claude (the model)</div><div><b>Job description</b>Role, goal, audience, tone, rules</div>
+    <div><b>Tools</b>The "hands": save order, search, email</div><div><b>Loop</b>Keep working until the job is done</div>
+  </div>
+  <div id="days"></div>
+  <div style="margin:16px 0"><input id="who" placeholder="Your name for the certificate" style="padding:10px;border-radius:8px;border:1px solid var(--line);width:min(300px,100%)"> <button class="btn" id="certBtn" disabled onclick="cert()">Get completion certificate</button>
+  <div style="font-size:12px;color:var(--muted);margin-top:6px">This is an Academy completion certificate, not an Anthropic certification. Claude certificates come from Anthropic.</div></div>
+  <div id="cert"><h2>Certificate of Completion</h2><p>This certifies that</p><h1 id="cn"></h1><p>completed the Agent Academy path: build, test, deploy and sell an AI agent.</p><p id="cd"></p></div>
+</div>
+<script>
+const COURSE = [
+ {t: 'Day 1 - AI and the agent formula', l: [['What is AI? Learns from examples, not fixed rules', 'Class 1'], ['Chatbot vs agent: prompting vs looping', 'Class 1'], ['The formula: Claude + job description + tools + loop', 'Class 1'], ['4 traits of a good agent: repeatable, rule-based, valuable, explainable', 'Class 1'], ['Open Claude, create a Project, write role/goal/audience/tone/rules', 'Live demo']]},
+ {t: 'Day 2 - Job description', l: [['Give the agent a job title and 7-part job description', 'Class 2'], ['Specific beats clever: one task, one job', 'Class 2-3'], ['Rule: "I don\'t know" instead of invented prices', 'Class 3'], ['Build the Admission Manager agent (Studio > Demo Gallery)', 'Practice']]},
+ {t: 'Day 3 - Memory and context', l: [['Built-in vs injected (permanent) vs short-term memory', 'Class 3'], ['Keep every fact in ONE place (no conflicting prices)', 'Class 3'], ['Context engineering: poisoning, distraction, fixes', '23 Jul, 21 Aug'], ['Edit a business file in Studio > Agent Builder and watch the agent change', 'Practice']]},
+ {t: 'Day 4 - Build your first agent with Claude Code', l: [['Create a project folder and a project .md file', 'Class 4'], ['Ask Claude Code for a single-page site with a chat widget', 'Class 4'], ['Keep API keys in .env, never on GitHub', '14 Aug, 21 Aug'], ['Git and GitHub: commit and push your project', '19 Aug']]},
+ {t: 'Day 5 - Test, secure and deploy', l: [['Test with many questions (Studio > Agent Tester)', '14 Aug'], ['Security scan (Studio > Security)', '14 Aug'], ['Deploy live (Vercel or Render) and add a login to the dashboard', '15 Aug, 29 Aug'], ['RAG: let the agent answer from your own documents (Studio > Knowledge Bot)', '22-23 Aug']]},
+ {t: 'Bonus - Channels', l: [['WhatsApp agent through Meta (Studio > Demo Gallery > WhatsApp)', '3 Sep'], ['Voice agent (mic button on any demo site; ElevenLabs is the class tool)', '3 Sep']]},
+ {t: 'Sell it - get clients', l: [['Sell outcomes, not "AI agents"', '27 Aug'], ['Find clients: research, cold email, LinkedIn, audits, referrals', '27 Aug'], ['Show the ROI: cost saved + money earned (Studio > Sales Kit)', '27 Aug'], ['Send a 10-minute free demo, then a proposal', '27 Aug'], ['Track every client in the CRM', '27 Aug']]}
+];
+let st = {}; try { st = JSON.parse(localStorage.acad || '{}'); } catch (e) {}
+const save = () => { try { localStorage.acad = JSON.stringify(st); } catch (e) {} };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render() {
+  let done = 0, total = 0;
+  document.getElementById('days').innerHTML = COURSE.map((d, i) => {
+    const c = d.l.filter((_, j) => st[i + '-' + j]).length; done += c; total += d.l.length;
+    return '<div class="day"><h2 onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">' + esc(d.t) + '<small>' + c + '/' + d.l.length + '</small></h2><div class="body">' +
+      d.l.map((x, j) => '<label><input type="checkbox" data-k="' + i + '-' + j + '"' + (st[i + '-' + j] ? ' checked' : '') + '><span>' + esc(x[0]) + '<em>' + esc(x[1]) + '</em></span></label>').join('') + '</div></div>';
+  }).join('');
+  document.querySelectorAll('input[data-k]').forEach(cb => cb.onchange = () => { st[cb.dataset.k] = cb.checked; save(); render(); });
+  const p = Math.round(100 * done / total);
+  document.getElementById('bar').style.width = p + '%'; document.getElementById('pct').textContent = p + '% complete (' + done + ' of ' + total + ' lessons)';
+  document.getElementById('certBtn').disabled = p < 100;
+}
+function cert() { const n = document.getElementById('who').value.trim() || 'Student'; document.getElementById('cn').textContent = n; document.getElementById('cd').textContent = new Date().toLocaleDateString(); document.getElementById('cert').style.display = 'block'; window.print(); }
+render();
+</script>
+</body>
+</html>

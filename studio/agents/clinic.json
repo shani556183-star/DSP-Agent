@@ -1,0 +1,31 @@
+{
+  "id": "clinic", "code": "CL", "name": "CarePlus Clinic", "industry": "Clinic / Healthcare", "emoji": "🩺", "color": "#7c3aed",
+  "tagline": "Book your doctor's appointment online", "city": "Karachi", "phone": "+92 300 4444444",
+  "address": "45 Clifton Block 5, Karachi", "hours": "Monday to Saturday, 9:00 am to 9:00 pm", "currency": "Rs",
+  "greeting": "I can help you book an appointment and answer questions about timings and fees. I can't give medical advice. How can I help?",
+  "offers": [],
+  "catalog_label": "Services",
+  "catalog": [
+    {"id": "general", "name": "General Consultation", "price": 1500, "desc": "General physician", "aliases": ["general", "consultation", "physician"]},
+    {"id": "dental", "name": "Dental Check-up", "price": 2000, "desc": "Examination and advice", "aliases": ["dental", "dentist", "teeth"]},
+    {"id": "skin", "name": "Skin Consultation", "price": 2500, "desc": "Dermatology", "aliases": ["skin", "dermatology", "dermatologist"]}
+  ],
+  "faq": [
+    {"keys": ["emergency", "urgent", "ambulance", "chest pain"], "a": "If this is an emergency please call your local emergency number or go to the nearest hospital right away. I cannot handle emergencies."},
+    {"keys": ["medicine", "medication", "prescription", "diagnose", "diagnosis", "symptoms", "dose"], "a": "I can't give medical advice. Please book an appointment and our doctor will help you."},
+    {"keys": ["insurance", "panel"], "a": "Insurance and panel details are confirmed by our reception when they call you."},
+    {"keys": ["report", "reports", "lab", "test", "tests"], "a": "Our reception can guide you about reports and tests. Leave your number and they will call you."}
+  ],
+  "flow": {"type": "booking", "record_label": "Appointment", "triggers": ["book", "appointment", "consult", "consultation", "visit", "checkup"],
+    "fields": [
+      {"key": "name", "type": "text", "ask_en": "Let's book your appointment. Your name?", "ask_ur": "Appointment book karte hain. Aap ka naam?"},
+      {"key": "phone", "type": "phone", "ask_en": "Your phone number?", "ask_ur": "Aap ka phone number?"},
+      {"key": "item", "type": "catalog", "ask_en": "Which service do you need?", "ask_ur": "Kaunsi service chahiye?"},
+      {"key": "when", "type": "text", "ask_en": "Preferred day and time?", "ask_ur": "Kaunsa din aur waqt theek rahega?"}]},
+  "role": "You are the reception assistant of CarePlus Clinic in Karachi.",
+  "goal": "Book appointments and answer questions about timings and fees.",
+  "audience": "Patients and their families.",
+  "tone": "Calm, polite and short.",
+  "rules": ["Never give medical advice, diagnosis or dosage.", "For emergencies tell the person to call the emergency number.", "Never confirm a slot; reception confirms by phone."],
+  "roi": {"monthly_leads": 180, "close_rate": 45, "avg_value": 2000, "missed_pct": 30, "staff_cost": 35000}
+}

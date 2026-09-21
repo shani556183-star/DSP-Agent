@@ -1,0 +1,116 @@
+{
+ "id": "glowsalon",
+ "code": "GL",
+ "custom": true,
+ "name": "Glow Salon",
+ "industry": "Beauty salon",
+ "emoji": "💇",
+ "color": "#be185d",
+ "tagline": "Book your hair and beauty appointment in a minute",
+ "city": "Lahore",
+ "phone": "+92 300 5555555",
+ "address": "DHA Phase 5, Lahore",
+ "hours": "Every day, 11 am to 9 pm",
+ "currency": "Rs",
+ "greeting": "I can show our services and book your appointment.",
+ "offers": [],
+ "catalog_label": "Menu / Services",
+ "catalog": [
+  {
+   "id": "i0",
+   "name": "Haircut",
+   "price": 1500,
+   "desc": "Wash and style",
+   "aliases": [
+    "haircut"
+   ]
+  },
+  {
+   "id": "i1",
+   "name": "Hair colour",
+   "price": 6000,
+   "desc": "Full colour",
+   "aliases": [
+    "hair colour",
+    "hair"
+   ]
+  },
+  {
+   "id": "i2",
+   "name": "Facial",
+   "price": 3500,
+   "desc": "Deep cleansing",
+   "aliases": [
+    "facial"
+   ]
+  }
+ ],
+ "faq": [
+  {
+   "keys": [
+    "bridal",
+    "wedding"
+   ],
+   "a": "We do bridal packages. Our team will call you with details."
+  },
+  {
+   "keys": [
+    "walk-in",
+    "walkin"
+   ],
+   "a": "Walk-ins are welcome, but appointments get priority."
+  }
+ ],
+ "flow": {
+  "type": "booking",
+  "record_label": "Booking",
+  "triggers": [
+   "book",
+   "appointment",
+   "reserve",
+   "schedule"
+  ],
+  "example": "2 haircut",
+  "fields": [
+   {
+    "key": "name",
+    "type": "text",
+    "ask_en": "Your name?",
+    "ask_ur": "Aap ka naam?"
+   },
+   {
+    "key": "phone",
+    "type": "phone",
+    "ask_en": "Your phone number?",
+    "ask_ur": "Aap ka phone number?"
+   },
+   {
+    "key": "item",
+    "type": "catalog",
+    "ask_en": "Which one would you like?",
+    "ask_ur": "Kaunsi cheez chahiye?"
+   },
+   {
+    "key": "when",
+    "type": "text",
+    "ask_en": "Preferred day and time?",
+    "ask_ur": "Kaunsa din aur waqt?"
+   }
+  ]
+ },
+ "role": "You are the assistant of Glow Salon.",
+ "goal": "Answer questions and take booking requests.",
+ "audience": "Customers of Glow Salon.",
+ "tone": "Friendly, short, clear.",
+ "rules": [
+  "Never confirm a time slot; the salon confirms by phone.",
+  "Never invent prices."
+ ],
+ "roi": {
+  "monthly_leads": 200,
+  "close_rate": 20,
+  "avg_value": 2000,
+  "missed_pct": 30,
+  "staff_cost": 40000
+ }
+}

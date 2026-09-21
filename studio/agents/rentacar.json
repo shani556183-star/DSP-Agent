@@ -1,0 +1,32 @@
+{
+  "id": "rentacar", "code": "RC", "name": "Speedy Rentals", "industry": "Car rental", "emoji": "🚗", "color": "#b45309",
+  "tagline": "Book a car in a minute, pick it up today", "city": "Islamabad", "phone": "+92 300 3333333",
+  "address": "Blue Area, Islamabad", "hours": "Every day, 8:00 am to 10:00 pm", "currency": "Rs",
+  "greeting": "I can show our cars and prices and book one for you. Which car and which dates?",
+  "offers": ["10% off for rentals of 7 days or more."],
+  "catalog_label": "Cars",
+  "catalog": [
+    {"id": "alto", "name": "Suzuki Alto", "price": 4500, "price_note": "/day", "desc": "Economical, 4 seats", "aliases": ["alto"]},
+    {"id": "corolla", "name": "Toyota Corolla", "price": 9000, "price_note": "/day", "desc": "Comfort sedan, 5 seats", "aliases": ["corolla"]},
+    {"id": "civic", "name": "Honda Civic", "price": 11000, "price_note": "/day", "desc": "Premium sedan, 5 seats", "aliases": ["civic"]},
+    {"id": "hiace", "name": "Toyota Hiace", "price": 14000, "price_note": "/day", "desc": "Van, 12 seats", "aliases": ["hiace", "van"]}
+  ],
+  "faq": [
+    {"keys": ["driver", "chauffeur"], "a": "Self-drive and with-driver options are both available. Tell us when booking; our team confirms the driver charges."},
+    {"keys": ["deposit", "security", "documents", "cnic", "license", "licence"], "a": "You need a valid driving licence and CNIC. Our team will confirm any deposit when they call you."},
+    {"keys": ["fuel", "petrol", "mileage", "km"], "a": "Fuel is paid by the customer. Mileage limits are confirmed by our team when they call."}
+  ],
+  "flow": {"type": "booking", "record_label": "Booking", "triggers": ["book", "rent", "hire", "reserve", "need", "want"],
+    "fields": [
+      {"key": "name", "type": "text", "ask_en": "Let's book it. Your name?", "ask_ur": "Booking kar dete hain. Aap ka naam?"},
+      {"key": "phone", "type": "phone", "ask_en": "Your phone number?", "ask_ur": "Aap ka phone number?"},
+      {"key": "item", "type": "catalog", "ask_en": "Which car would you like?", "ask_ur": "Kaunsi car chahiye?"},
+      {"key": "dates", "type": "text", "ask_en": "From which date and for how many days?", "ask_ur": "Kis tareekh se aur kitne din ke liye?"},
+      {"key": "pickup", "type": "text", "ask_en": "Pickup location?", "ask_ur": "Pickup kahan se hogi?"}]},
+  "role": "You are the booking assistant of Speedy Rentals in Islamabad.",
+  "goal": "Show cars and prices and take booking requests.",
+  "audience": "Travellers, families and business visitors.",
+  "tone": "Quick, friendly and precise.",
+  "rules": ["Never confirm availability; a team member confirms by phone.", "Never invent prices or discounts.", "Only the listed offer may be mentioned."],
+  "roi": {"monthly_leads": 200, "close_rate": 25, "avg_value": 18000, "missed_pct": 30, "staff_cost": 45000}
+}

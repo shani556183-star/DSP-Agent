@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Business demo</title>
+<style>
+:root{--brand:#c8321f;--bg:#fffaf3;--ink:#2b1d16;--muted:#7a6a5f;--card:#fff;--line:#eadfd2;--bot:#f3ece2}
+@media (prefers-color-scheme:dark){:root{--bg:#171210;--ink:#f6ece2;--muted:#b9a99b;--card:#221a16;--line:#392c25;--bot:#33261f}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+.logo{font-weight:800;font-size:20px;color:var(--brand)}
+nav a{color:var(--muted);text-decoration:none;margin-left:16px;font-size:14px}
+.hero{padding:34px 0 22px}
+.hero h1{font-size:clamp(30px,6vw,50px);line-height:1.1;margin:0 0 12px}
+.hero p{color:var(--muted);font-size:18px;max-width:560px;margin:0 0 20px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-size:16px;font-weight:600;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--muted)}
+h2{margin:30px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card b{display:block}.card small{color:var(--muted)}
+.price{color:var(--brand);font-weight:700;margin-top:8px}
+.card button{margin-top:10px;background:transparent;border:1px solid var(--brand);color:var(--brand);border-radius:8px;padding:6px 12px;cursor:pointer}
+footer{color:var(--muted);font-size:13px;padding:28px 0 100px}
+footer a{color:var(--brand)}
+#chatBtn{position:fixed;right:18px;bottom:18px;z-index:10;border-radius:999px;box-shadow:0 6px 20px #0004}
+#chat{position:fixed;right:18px;bottom:78px;width:min(380px,calc(100vw - 36px));height:min(540px,calc(100vh - 110px));background:var(--card);border:1px solid var(--line);border-radius:16px;display:none;flex-direction:column;box-shadow:0 10px 40px #0005;z-index:10;overflow:hidden}
+#chat.open{display:flex}
+.ch{background:var(--brand);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ch small{opacity:.85;display:block;font-size:11px}
+.ch button,.ch select{background:none;border:0;color:#fff;font-size:18px;cursor:pointer}
+.ch select{font-size:12px;background:#0002;border-radius:6px;padding:2px}.ch select option{color:#000}
+#msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:88%;padding:8px 12px;border-radius:14px;white-space:pre-wrap;font-size:14px}
+.m.bot{background:var(--bot);align-self:flex-start;border-bottom-left-radius:4px}
+.m.me{background:var(--brand);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.quick{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 8px}
+.quick button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
+form{display:flex;border-top:1px solid var(--line);align-items:center}
+form input{flex:1;border:0;padding:12px;font-size:15px;background:transparent;color:var(--ink);outline:none;min-width:0}
+form button{border:0;background:none;color:var(--brand);font-weight:700;padding:0 12px;cursor:pointer;font-size:15px}
+#mic.on{color:#e11d48}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="logo" id="logo"></div><nav><a href="#menu" id="navMenu">Menu</a><a href="#info">Info</a></nav></header>
+  <section class="hero">
+    <h1 id="tag"></h1>
+    <p>Chat with our assistant any time of day. It shows the details, answers questions and takes your request in a minute.</p>
+    <button class="btn" onclick="openChat()">Chat with the assistant</button>
+    <div class="chips" id="chips"></div>
+  </section>
+  <h2 id="menu"></h2>
+  <div class="grid" id="grid"></div>
+  <h2 id="info">Visit &amp; contact</h2>
+  <div class="card" id="infoCard"></div>
+  <footer>Demo website (fictional business). Built with Claude + a small Python backend. <a href="/">&larr; Agent Studio</a></footer>
+</div>
+<button class="btn" id="chatBtn" onclick="openChat()">Chat</button>
+<div id="chat" role="dialog" aria-label="Chat">
+  <div class="ch"><div><b id="cname"></b><small id="mode"></small></div>
+    <div><select id="lang" title="Voice language"><option value="en-US">EN</option><option value="ur-PK">UR</option></select>
+    <button id="speak" title="Read replies aloud" aria-pressed="false">🔈</button><button onclick="closeChat()" aria-label="Close">&times;</button></div></div>
+  <div id="msgs"></div>
+  <div class="quick" id="quick"></div>
+  <form id="f"><input id="in" placeholder="Type or tap the mic..." autocomplete="off"><button type="button" id="mic" title="Speak">🎤</button><button>Send</button></form>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const bid = location.pathname.split('/').filter(Boolean).pop();
+const sid = (() => { try { return sessionStorage.sid || (sessionStorage.sid = Math.random().toString(36).slice(2)); } catch (e) { return Math.random().toString(36).slice(2); } })();
+let biz = null, opened = false, speaking = false;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function add(text, who) { const d = document.createElement('div'); d.className = 'm ' + who; d.textContent = text; $('msgs').appendChild(d); $('msgs').scrollTop = 1e9; }
+function say(t) { if (!speaking || !window.speechSynthesis) return; const u = new SpeechSynthesisUtterance(t); u.lang = $('lang').value; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+async function send(text) {
+  add(text, 'me');
+  try {
+    const r = await fetch('/api/chat', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({biz: bid, session: sid, message: text})});
+    const j = await r.json(); const rep = j.reply || 'Sorry, something went wrong.'; add(rep, 'bot'); say(rep);
+  } catch (e) { add('Connection problem. Please try again.', 'bot'); }
+}
+function openChat() { $('chat').classList.add('open'); $('in').focus(); if (!opened && biz) { opened = true; add('Hi! Welcome to ' + biz.name + '. ' + biz.greeting, 'bot'); } }
+function closeChat() { $('chat').classList.remove('open'); }
+$('f').addEventListener('submit', e => { e.preventDefault(); const v = $('in').value.trim(); if (!v) return; $('in').value = ''; send(v); });
+$('speak').onclick = () => { speaking = !speaking; $('speak').textContent = speaking ? '🔊' : '🔈'; $('speak').setAttribute('aria-pressed', speaking); if (!window.speechSynthesis) alert('Your browser cannot speak replies.'); };
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+$('mic').onclick = () => {
+  if (!SR) { alert('Voice input works in Chrome or Edge. You can still type.'); return; }
+  const r = new SR(); r.lang = $('lang').value; r.interimResults = false;
+  $('mic').classList.add('on');
+  r.onresult = e => { const t = e.results[0][0].transcript; $('in').value = ''; send(t); };
+  r.onend = () => $('mic').classList.remove('on'); r.onerror = () => $('mic').classList.remove('on');
+  r.start();
+};
+fetch('/api/agents/' + bid).then(r => r.json()).then(b => {
+  if (b.error) { document.body.innerHTML = '<p style="padding:30px">Business not found. <a href="/">Back to Studio</a></p>'; return; }
+  biz = b; document.title = b.name;
+  document.documentElement.style.setProperty('--brand', b.color || '#c8321f');
+  $('logo').textContent = b.emoji + ' ' + b.name; $('tag').textContent = b.tagline; $('cname').textContent = b.name + ' assistant';
+  $('menu').textContent = b.catalog_label || 'Menu'; $('navMenu').textContent = b.catalog_label || 'Menu';
+  $('chips').innerHTML = [b.hours, b.city, (b.offers || [])[0]].filter(Boolean).map(x => '<span class="chip">' + esc(x) + '</span>').join('');
+  const type = b.flow.type, trig = (b.flow.triggers || ['book'])[0];
+  $('grid').innerHTML = (b.catalog || []).map(m => {
+    const price = m.price ? '<div class="price">' + esc(b.currency) + ' ' + Number(m.price).toLocaleString() + esc(m.price_note || '') + '</div>' : '';
+    const label = type === 'order' ? 'Add' : type === 'booking' ? 'Book' : 'I\'m interested';
+    const msg = type === 'order' ? '1 ' + ((m.aliases || [m.name])[0]) : trig + ' ' + m.name;
+    return '<div class="card"><b>' + esc(m.name) + '</b><small>' + esc(m.desc || '') + '</small>' + price + '<button data-m="' + esc(msg) + '">' + label + '</button></div>';
+  }).join('');
+  document.querySelectorAll('.card button[data-m]').forEach(bt => bt.onclick = () => { openChat(); send(bt.dataset.m); });
+  $('infoCard').innerHTML = '<b>' + esc(b.address) + '</b><br>' + esc(b.phone) + '<br>' + esc(b.hours) + (b.offers && b.offers.length ? '<br><br>Offer: ' + esc(b.offers.join(' ')) : '');
+  const q = type === 'order' ? ['Show menu', 'Delivery info', '2 ' + (((b.catalog[0] || {}).aliases || ['item'])[0]) + ' please', 'Confirm'] : ['What do you offer?', 'Opening hours', trig === 'book' ? 'I want to book' : 'I am interested'];
+  $('quick').innerHTML = q.map(x => '<button>' + esc(x) + '</button>').join('');
+  document.querySelectorAll('#quick button').forEach(bt => bt.onclick = () => { send(bt.textContent); });
+});
+fetch('/api/status').then(r => r.json()).then(s => { $('mode').textContent = s.claude ? 'Powered by Claude' : 'Demo mode (offline agent)'; });
+</script>
+</body>
+</html>
