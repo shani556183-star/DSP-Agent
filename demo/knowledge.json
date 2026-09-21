@@ -1,0 +1,28 @@
+{
+  "business": {
+    "name": "Mario's Pizza",
+    "tagline": "Hot, fresh pizza delivered in 45 minutes",
+    "city": "Lahore",
+    "address": "12 Main Boulevard, Gulberg, Lahore",
+    "phone": "+92 300 0000000",
+    "hours": "Every day, 12:00 pm to 1:00 am",
+    "delivery": "Free delivery on orders above Rs 2000. Otherwise Rs 200. Usual time: 45 minutes.",
+    "payment": "Cash on delivery or bank transfer.",
+    "offers": ["Free cola with any 2 pizzas."]
+  },
+  "menu": [
+    {"id": "margherita", "name": "Margherita Pizza", "price": 1200, "desc": "Tomato sauce, mozzarella, basil", "aliases": ["margherita", "margarita"]},
+    {"id": "pepperoni", "name": "Pepperoni Pizza", "price": 1500, "desc": "Beef pepperoni, mozzarella", "aliases": ["pepperoni"]},
+    {"id": "fajita", "name": "Fajita Pizza", "price": 1400, "desc": "Chicken fajita, peppers, onion", "aliases": ["fajita"]},
+    {"id": "bbq", "name": "BBQ Chicken Pizza", "price": 1600, "desc": "BBQ chicken, onion, cheese", "aliases": ["bbq", "barbecue", "bar b q"]},
+    {"id": "garlic", "name": "Garlic Bread", "price": 500, "desc": "Toasted, buttery, cheesy", "aliases": ["garlic bread", "garlic"]},
+    {"id": "fries", "name": "Fries", "price": 450, "desc": "Crispy, lightly salted", "aliases": ["fries", "french fries"]},
+    {"id": "cola", "name": "Cola (500 ml)", "price": 150, "desc": "Chilled", "aliases": ["cola", "coke", "drink", "pepsi"]}
+  ],
+  "rules": [
+    "Answer only from this information. If something is not here, say you do not know and offer a call from staff.",
+    "Never invent prices, discounts, ingredients or delivery times.",
+    "Never promise a discount that is not listed under offers.",
+    "Be friendly, short and clear. Reply in the customer's language (English or Roman Urdu)."
+  ]
+}

@@ -5,3 +5,5 @@
 *.part
 __pycache__/
 out/*.tmp
+demo/data/
+demo/server.log
